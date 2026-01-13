@@ -73,7 +73,7 @@ with tab_home:
     c1, c2, c3 = st.columns(3)
     with c1: st.image("images/space1.jpg", width='stretch')
     with c2: st.image("images/space2.jpg", width='stretch')
-    with c3: st.image("images/space3.JPG", width='stretch')
+    with c3: st.image("images/space3.jpg", width='stretch')
     
     st.divider()
     
