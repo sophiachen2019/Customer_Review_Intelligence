@@ -40,6 +40,10 @@ NEON_DB_CONNECTION_STRING = "postgres://USER:PASSWORD@ep-example.region.aws.neon
 GOOGLE_API_KEY = "your_google_ai_studio_api_key_here"
 ```
 
+> [!WARNING]
+> **NEVER commit your `secrets.toml` file or `.env` file to GitHub.**
+> We have included a `.secrets.toml.example` file in the repository. Rename it to `secrets.toml` for local development, but ensure the real file is ignored by git (added to `.gitignore`).
+
 *Replace the values with your actual `NEON_DB_CONNECTION_STRING` and `GOOGLE_API_KEY` from your local `.env` or `secrets.toml` file.*
 
 ## Step 4: Verify
