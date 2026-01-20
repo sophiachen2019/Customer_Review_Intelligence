@@ -17,9 +17,32 @@ st.set_page_config(page_title="Customer Review Intelligence", layout="wide")
 # Initialize DB (safe to call multiple times as it uses IF NOT EXISTS)
 db_utils.init_db()
 
+
 # Header
 st.title("🍵 Southern Frontier Customer Review Intelligence")
 st.markdown("**Builder:** [Sophia Chen](https://www.linkedin.com/in/sophia-chen-34794893/) | **Email:** sophiachen2012@gmail.com | **Medium:** https://medium.com/@sophiachen2012")
+
+# Admin Authentication
+with st.sidebar:
+    st.markdown("### 🔒 Admin Access")
+    admin_password = st.text_input("Admin Password", type="password", help="Enter password to enable editing and uploading.")
+    
+    is_admin = False
+    if admin_password:
+        try:
+            # Check against secret
+            correct_password = st.secrets["ADMIN_PASSWORD"]
+            if admin_password == correct_password:
+                is_admin = True
+                st.success("Admin Mode: Enabled ✅")
+            else:
+                st.error("Invalid Password")
+        except Exception:
+            # If secret is not set, we default to blocking or maybe allowing (fail safe vs fail open)
+            # Fail safe: Block if no secret configured
+            st.error("Admin password not configured in secrets.")
+    else:
+        st.info("Read-Only Mode")
 
 # Tabs
 # Custom CSS for larger tabs
@@ -104,7 +127,13 @@ with tab_home:
 
 with tab1:
     st.header("Upload Review Screenshot")
-    uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+    uploaded_files = None
+    if is_admin:
+        uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+    else:
+        st.info("🔒 **Admin Access Required**")
+        st.markdown("Please enter the Admin Password in the sidebar to upload and save new reviews.")
+        st.image("images/space1.jpg", caption="Login to access flight controls...", width=400)
 
     if uploaded_files:
         # If only one file, wrap in list for consistent handling if needed, but uploaded_files is already a list
@@ -239,15 +268,16 @@ with tab2:
 
         st.markdown("### Manage Reviews")
         
-        st.caption("💡 Tip: Click column headers to sort. Use the menu in headers to filter. Select rows to delete.")
-        
-
+        if is_admin:
+            st.caption("💡 Tip: Click column headers to sort. Use the menu in headers to filter. Select rows to delete (Admin).")
+        else:
+             st.caption("💡 Tip: Click column headers to sort. Filtering available. Read-Only Mode.")
         
         # Configure AgGrid
         gb = GridOptionsBuilder.from_dataframe(df_display)
         gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20) # Add pagination
         gb.configure_side_bar() # Add a sidebar
-        gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=True)
+        gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=is_admin)
         
         # Configure specific columns
         gb.configure_column("id", editable=False)
