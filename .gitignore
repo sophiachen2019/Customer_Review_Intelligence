@@ -14,3 +14,8 @@ __pycache__/
 # Virtual Environment
 venv/
 env/
+
+# Uploads and Assets
+assets/
+images/
+uploads/

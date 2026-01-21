@@ -495,7 +495,7 @@ with tab3:
         total_reviews = len(df_filtered)
         
         # 2. New Reviews (Last 7 Days)
-        today = datetime.date.today()
+        today = df_analysis['review_date'].max().date() if not df_analysis.empty else datetime.date.today()
         seven_days_ago = today - datetime.timedelta(days=7)
         mask_7d = (df_analysis['review_date'].dt.date >= seven_days_ago) & (df_analysis['review_date'].dt.date <= today)
         df_7d = df_analysis.loc[mask_7d]
@@ -636,9 +636,22 @@ with tab3:
         # --- Section 2: Sentiment Analysis ---
         st.subheader("🤖 AI Sentiment Analysis")
         
+        # Rate Limiting Logic
+        if 'report_gen_count' not in st.session_state:
+            st.session_state['report_gen_count'] = 0
+            
+        LIMIT = 5
+        remaining = LIMIT - st.session_state['report_gen_count']
+        
+        st.caption(f"**Quota:** {remaining}/{LIMIT} reports remaining this session.")
+        
         language = st.selectbox("Select Report Language", ["English", "Chinese"])
         
-        generate_clicked = st.button("Generate Intelligence Report")
+        if remaining > 0:
+            generate_clicked = st.button("Generate Intelligence Report")
+        else:
+            st.warning("⚠️ You have reached the limit of 5 reports per session. Please refresh the page to reset.")
+            generate_clicked = False
         
         # Area for status messages (spinner)
         status_area = st.empty()
@@ -658,7 +671,7 @@ with tab3:
             
             st.markdown(st.session_state['generated_report'])
             
-            c_down1, c_down2 = st.columns(2)
+            c_down1, c_down2, c_down3 = st.columns(3)
             
             with c_down1:
                 # Convert to PDF on the fly
@@ -680,6 +693,16 @@ with tab3:
                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 )
 
+            with c_down3:
+                # Convert to PPTX on the fly
+                pptx_io = report_utils.create_pptx_from_markdown(st.session_state['generated_report'])
+                st.download_button(
+                    label="Download Report as PPTX",
+                    data=pptx_io,
+                    file_name=f"intelligence_report_{datetime.date.today()}.pptx",
+                    mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                )
+
         # Logic for generation
         if generate_clicked:
             with status_area:
@@ -695,12 +718,19 @@ with tab3:
                         full_report = ""
                         report_placeholder = st.empty()
                         
-                        for chunk in report_stream:
-                            if hasattr(chunk, 'text'):
-                                full_report += chunk.text
-                                report_placeholder.markdown(full_report + "▌")
-                                
-                        report_placeholder.markdown(full_report)
+                        if isinstance(report_stream, str) and report_stream.startswith("Error"):
+                             st.error(report_stream)
+                             full_report = report_stream # Or keep empty, but show error
+                        else:
+                            try:
+                                for chunk in report_stream:
+                                    if hasattr(chunk, 'text'):
+                                        full_report += chunk.text
+                                        report_placeholder.markdown(full_report + "▌")
+                                report_placeholder.markdown(full_report)
+                            except Exception as e:
+                                st.error(f"Stream error: {str(e)}")
+                                full_report = f"Error during generation: {str(e)}"
                         st.session_state['generated_report'] = full_report
                         
                         # Store exact metadata
@@ -718,6 +748,9 @@ with tab3:
                             'count': count,
                             'generated_on': datetime.date.today().strftime('%Y-%m-%d')
                         }
+                        
+                        # Increment Usage Counter
+                        st.session_state['report_gen_count'] += 1
                     else:
                         st.warning("No reviews found in the selected date range to analyze.")
             

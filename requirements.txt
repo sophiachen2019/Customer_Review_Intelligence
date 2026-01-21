@@ -6,4 +6,5 @@ Pillow
 python-dotenv
 streamlit-aggrid
 fpdf
+python-pptx
 python-docx
