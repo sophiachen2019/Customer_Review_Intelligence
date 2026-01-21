@@ -15,7 +15,5 @@ __pycache__/
 venv/
 env/
 
-# Uploads and Assets
-assets/
-images/
+# Uploads
 uploads/
