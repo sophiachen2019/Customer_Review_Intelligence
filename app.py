@@ -149,6 +149,11 @@ with tab1:
             uploads_dir = "uploads"
             os.makedirs(uploads_dir, exist_ok=True)
             
+            # Limit to 10 for non-admins to prevent overload
+            if not is_admin and len(uploaded_files) > 10:
+                st.warning("⚠️ Read-Only Limit: Processing only the first 10 images.")
+                uploaded_files = uploaded_files[:10]
+
             with st.spinner("Preparing images..."):
                 for uploaded_file in uploaded_files:
                     file_path = os.path.join(uploads_dir, uploaded_file.name)
