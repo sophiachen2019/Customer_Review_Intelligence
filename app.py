@@ -128,12 +128,10 @@ with tab_home:
 with tab1:
     st.header("Upload Review Screenshot")
     uploaded_files = None
-    if is_admin:
-        uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
-    else:
-        st.info("🔒 **Admin Access Required**")
-        st.markdown("Please enter the Admin Password in the sidebar to upload and save new reviews.")
-        st.image("images/space1.jpg", caption="Login to access flight controls...", width=400)
+    # Allow everyone to upload and test extraction
+    uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+    if not is_admin:
+        st.info("👀 **Read-Only Mode**: You can extract data to test the OCR, but saving is disabled.")
 
     if uploaded_files:
         # If only one file, wrap in list for consistent handling if needed, but uploaded_files is already a list
@@ -213,7 +211,11 @@ with tab1:
                         st.text_area("Content", data.get('content'), height=100, key=f"content_{i}")
                         st.json(data, expanded=False)
 
-                submitted = st.form_submit_button("Save All to Database")
+                if is_admin:
+                    submitted = st.form_submit_button("Save All to Database")
+                else:
+                    submitted = st.form_submit_button("Save All to Database", disabled=True)
+                    st.caption("🔒 Admin access required to save changes.")
                 
             if submitted:
                 saved_count = 0
