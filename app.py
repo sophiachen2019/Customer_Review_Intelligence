@@ -344,7 +344,7 @@ with tab3:
     with st.sidebar:
          st.markdown("### 🤖 Canvas")
          with st.popover("💬 AI Assistant", help="Ask questions about your data"):
-              st.markdown("### Southern Frontier Asssistant")
+              st.markdown("### Southern Frontier Assistant")
               
               # Check validity
               if not chatbot_utils.configure_genai():
