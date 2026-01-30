@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS reviews (
     image_path TEXT,
     source_filename TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(username, content)
+    UNIQUE(user_name, content)
 );
