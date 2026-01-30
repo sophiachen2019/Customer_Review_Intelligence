@@ -2,13 +2,13 @@
 
 **Transforming customer feedback into business growth.**
 
-This application is a comprehensive **Customer Review Intelligence System** built with **Streamlit**. It allows businesses to aggregate reviews from screenshots (using AI OCR), store them in a structured Postgres database, visualize trends, and chat with their data using an AI assistant.
+This application is a comprehensive **Customer Review Intelligence System** built with **Streamlit**. It allows businesses to aggregate reviews from screenshots (using AI OCR), store them in a structured Postgres database, visualize trends, generate insights reports, and chat with their data using an AI assistant.
 
 ---
 
 ## ✨ Features
 
-*   **📥 Review Ingestion via OCR**: Upload screenshots of customer reviews (e.g., from food delivery apps). The app uses **Google Gemini Flash 1.5** to automatically extract:
+*   **📥 Review Ingestion via OCR**: Upload screenshots of customer reviews. The app uses **Google Gemini 3 Flash** to automatically extract:
     *   User Name
     *   Rating (Overall, Taste, Environment, Service, Value)
     *   Review Content
@@ -77,16 +77,27 @@ streamlit run app.py
 
 This application was built using an **Agentic AI Workflow**. Below is the original high-level prompt that kickstarted the development process:
 
-> **"Build a specialized 'Customer Review Intelligence' dashboard for 'Southern Frontier' (a premium tea brand).**
+
+> **Mission: Build a Review Intelligence App**
 >
-> **Core Request:**
-> I need a tool to aggregate and analyze customer reviews from screenshots. We have hundreds of reviews on delivery platforms but no API access.
+> **Project Goal:** Create a full-stack web application that extracts structured data from uploaded screenshots of reviews, stores them in a database, and provides sentiment insights.
 >
-> **Key Capabilities Needed:**
-> 1.  **Ingestion**: A drag-and-drop web interface where I can upload screenshots of reviews. Use a Multimodal LLM (Gemini Flash) to 'read' these images and extract: Rating (Taste/Env/Service), Date, Content, and User Name.
-> 2.  **Storage**: Save this structured data into a Postgres database (Neon) so we build a historical asset.
-> 3.  **Visualization**: A 'Metrics' tab showing trends over time (moving averages of ratings), and volume of reviews.
-> 4.  **AI Analyst**: I want to 'chat' with my data. Include a chatbot sidebar where I can ask 'Why did our service rating drop last week?' and it answers based on the actual review text.
-> 5.  **Reporting**: A button to generate a 'Weekly Intelligence Report' as a PDF, summarizing sentiment and key actionable advice.
+> **Core Features to Implement:**
 >
-> **Tech Stack**: Streamlit (frontend), Python, Neon (DB), Google Gemini (AI)."
+> **Data Ingestion:** A frontend page to upload images. Use Gemini 3 Flash to process the images and extract: Username, Date, Total Rating, Rating Breakdown (Taste, Environment, Service, Value), and Review Content.
+>
+> **Database:** Set up a SQLite or PostgreSQL database. Create a schema to store the extracted data and ensure new uploads append to the existing table.
+>
+> **Dashboard:** A consolidated view showing a table of all reviews.
+>
+> **Analysis Engine:** A summary section that uses an LLM to analyze the entire database to provide:
+> *   Overall sentiment (Positive/Neutral/Negative).
+> *   Key recurring themes or complaints.
+> *   Actionable suggestions for the business.
+>
+> **Tech Stack Preference:**
+>
+> *   **Frontend/Backend:** Python with Streamlit (for rapid prototyping) or FastAPI with a React frontend.
+> *   **AI Integration:** Use the Gemini API for both OCR/Extraction and Sentiment Analysis.
+>
+> **Verification:** Once the code is written, use the integrated browser to test the upload flow with a sample image and verify the database entries appear in the dashboard.
