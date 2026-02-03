@@ -19,7 +19,7 @@ def configure_genai():
 
 def extract_review_data(image):
     """
-    Sends an image to Gemini 1.5 Flash to extract review data.
+    Sends an image to Gemini 3 Flash to extract review data.
     Returns a dictionary with Username, Date, Rating, and Content.
     """
     configure_genai()

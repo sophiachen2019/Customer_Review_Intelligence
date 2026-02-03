@@ -9,6 +9,7 @@ import os
 import concurrent.futures
 import altair as alt
 from st_aggrid import AgGrid, GridOptionsBuilder
+from PIL import Image
 
 # Page Config
 st.set_page_config(page_title="Customer Review Intelligence", layout="wide")
