@@ -37,10 +37,10 @@ with st.sidebar:
                 st.success("Admin Mode: Enabled ✅")
             else:
                 st.error("Invalid Password")
-        except Exception:
+        except Exception as e:
             # If secret is not set, we default to blocking or maybe allowing (fail safe vs fail open)
             # Fail safe: Block if no secret configured
-            st.error("Admin password not configured in secrets.")
+            st.error(f"Admin password error: {e}")
     else:
         st.info("Read-Only Mode")
 
