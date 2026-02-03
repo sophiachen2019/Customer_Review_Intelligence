@@ -2,24 +2,26 @@
 
 **Transforming customer feedback into business growth.**
 
-This application is a comprehensive **Customer Review Intelligence System** built with **Streamlit**. It allows businesses to aggregate reviews from screenshots (using AI OCR), store them in a structured Postgres database, visualize trends, generate insights reports, and chat with their data using an AI assistant.
+This application is a comprehensive **Customer Review Intelligence System** built with **Streamlit**. It allows businesses to aggregate reviews from screenshots, store them in a structured Postgres database, visualize trends, generate insights reports, and chat with their data using an AI assistant.
+
+Try the app out here: https://customer-review-intelligence.streamlit.app/
 
 ---
 
 ## ✨ Features
 
-*   **📥 Review Ingestion via OCR**: Upload screenshots of customer reviews. The app uses **Google Gemini 3 Flash** to automatically extract:
+*   **📥 Review Ingestion**: Upload screenshots of customer reviews. The app uses **Google Gemini 3 Flash** to automatically extract:
     *   User Name
+    *   Review Date
     *   Rating (Overall, Taste, Environment, Service, Value)
-    *   Review Content
-    *   Date
+    *   Review Text
 *   **🗄️ Centralized Database**: reliable storage using **Neon (Postgres)**.
 *   **📈 Interactive Analytics**:
     *   Time-series trends for ratings and review volume.
     *   7-Day Rolling Averages.
     *   Sentiment Breakdown (Positive/Neutral/Negative).
 *   **🤖 AI Intelligence**:
-    *   **RAG Chatbot**: Chat with your review data ("What do customers say about our tea packaging?").
+    *   **RAG Chatbot**: Chat with your review data ("What do customers say about our tea drink?").
     *   **Automated Reports**: Generate and download PDF/DOCX/PPTX reports summarizing recent feedback.
 
 ---
