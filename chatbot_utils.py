@@ -58,7 +58,7 @@ def get_data_context(df):
     
     return "\n".join(buffer)
 
-def chat_stream(messages, report_context="", data_context=""):
+def chat_stream(messages, report_context="", data_context="", language="English"):
     """
     Streams response from Gemini model.
     """
@@ -67,6 +67,8 @@ def chat_stream(messages, report_context="", data_context=""):
     You are an expert AI Assistant for the "Southern Frontier Customer Review Intelligence" application.
     
     Your goal is to answer user questions about the TOOL, the DATA, and the REPORTS.
+    
+    IMPORTANT: You must answer in {language}.
     
     --- CONTEXT 1: APP FUNCTIONALITY (The Tool) ---
     - **Home Tab**: Overview of the brand and products (Shu/Sheng Pu'er tea, Tea Cakes, etc.).
@@ -89,6 +91,7 @@ def chat_stream(messages, report_context="", data_context=""):
     3. USE the 'UNDERLYING DATA SNAPSHOT' for specific examples or stats.
     4. If asked about how to use the app, refer to the 'APP FUNCTIONALITY' context.
     5. Be professional, concise, and helpful.
+    6. ALWAYS respond in {language}.
     """
     
     # Configure Model

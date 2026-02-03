@@ -716,6 +716,9 @@ with tab_ai:
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
     
+    # Language Selection
+    app_language = st.radio("Select Language", ["English", "Chinese"], horizontal=True, key="ai_lang_select")
+    
     # Handle User Input
     # Check if we have a preset prompt from buttons
     user_input = st.chat_input("Ask a question...")
@@ -756,7 +759,8 @@ with tab_ai:
                     response_stream = chatbot_utils.chat_stream(
                         messages=st.session_state.messages,
                         report_context=report_context,
-                        data_context=data_context
+                        data_context=data_context,
+                        language=app_language
                     )
                     
                     for chunk in response_stream:
