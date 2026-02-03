@@ -1,4 +1,3 @@
-import google.generativeai as genai
 import json
 import os
 from PIL import Image
@@ -15,6 +14,7 @@ def configure_genai():
     if not api_key:
         raise ValueError("Google API Key not found in secrets.toml or environment variables.")
     
+    import google.generativeai as genai
     genai.configure(api_key=api_key)
 
 def extract_review_data(image):
@@ -25,6 +25,7 @@ def extract_review_data(image):
     configure_genai()
     
     # Using gemini-3-flash-preview as requested
+    import google.generativeai as genai
     model = genai.GenerativeModel('gemini-3-flash-preview')
     
     prompt = """
@@ -65,6 +66,7 @@ def analyze_sentiment_batch(reviews, language="English", stream=False):
     """
     configure_genai()
     # Using gemini-3-flash-preview as requested
+    import google.generativeai as genai
     model = genai.GenerativeModel('gemini-3-flash-preview')
     
     reviews_text = json.dumps(reviews, indent=2)

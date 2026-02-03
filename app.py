@@ -1,10 +1,9 @@
 import streamlit as st
-from PIL import Image
-import ocr_utils
-import report_utils
+print("DEBUG: App execution started")
 import db_utils
-import chatbot_utils
+print("DEBUG: Imported db_utils")
 import pandas as pd
+print("DEBUG: Imported pandas")
 import datetime
 import os
 import concurrent.futures
@@ -51,41 +50,11 @@ st.markdown("""
     .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
         font-size: 1.2rem;
     }
-    
-    /* Move Sidebar to Right using Rerverse Flex */
-    /* This overrides the default left positioning by swapping the order */
-    
-    div[data-testid="stSidebarNav"] {
-        display: none;
-    }
-    
-    section[data-testid="stSidebar"] {
-        /* Reset positioning */
-        left: unset !important;
-        right: 0 !important;
-    }
-    
-    /* Target the main container to reverse styling */
-    /* This selector targets the flex container holding the sidebar and main content */
-    .stApp > header + div {
-        flex-direction: row-reverse;
-    }
-    
-    /* Fix for collapse button */
-    div[data-testid="stSidebarCollapsedControl"] {
-        left: unset !important;
-        right: 0 !important; 
-    }
-    
-    /* Ensure resizing handle is on the correct side (visual only) */
-    div[data-testid="stSidebarUserContent"] {
-        padding-top: 2rem; 
-    }
-    
 </style>
 """, unsafe_allow_html=True)
 
-tab_home, tab1, tab2, tab3 = st.tabs(["🏠 Home", "📥 Ingestion", "🗄️ Database", "📈 Analysis"])
+print("DEBUG: Defining tabs")
+tab_home, tab1, tab2, tab3, tab_ai = st.tabs(["🏠 Home", "📥 Ingestion", "🗄️ Database", "📈 Analysis", "🤖 AI Assistant"])
 
 with tab_home:
     st.markdown("### Welcome to Southern Frontier Customer Review Intelligence")
@@ -138,6 +107,7 @@ with tab1:
         st.write(f"Uploaded {len(uploaded_files)} images.")
         
         if st.button("Extract Data from All"):
+            import ocr_utils
             # Clear existing session data for fresh upload
             st.session_state['extracted_data_list'] = []
             
@@ -168,6 +138,7 @@ with tab1:
                     with Image.open(fpath) as img:
                         # Ensure image is loaded
                         img.load()
+                        import ocr_utils
                         result = ocr_utils.extract_review_data(img)
                     return result, fname, fpath
                 except Exception as e:
@@ -330,78 +301,8 @@ with tab2:
 with tab3:
     
     
-    # AI Assistant Popover
-    with st.sidebar:
-          # We place it in sidebar or use a floating button concept?
-          # User asked for "Pop up or flowing experience on Analysis page"
-          # Putting it at the top or bottom of Analysis tab via st.popover
-          pass
-    
-    # To make it "flowing", we can put a persistent popover button at the top/bottom
-    st.subheader("📊 Metrics Summary")
-    
-    # AI Assistant in Sidebar (Floating/Sticky)
-    with st.sidebar:
-         st.markdown("### 🤖 Canvas")
-         with st.popover("💬 AI Assistant", help="Ask questions about your data"):
-              st.markdown("### Southern Frontier Assistant")
-              
-              # Check validity
-              if not chatbot_utils.configure_genai():
-                  st.warning("⚠️ Google API Key not found.")
-                  st.stop()
+    # AI Assistant removed from sidebar
 
-              # Initialize Chat History
-              if "messages" not in st.session_state:
-                  st.session_state.messages = [
-                      {"role": "assistant", "content": "Hello! I've analyzed your reviews. Ask me anything!"}
-                  ]
-
-              # Display Chat History
-              for msg in st.session_state.messages:
-                  with st.chat_message(msg["role"]):
-                      st.markdown(msg["content"])
-
-              # Handle User Input
-              # Note: st.chat_input in popover might close it on submit.
-              # If that happens, we need to instruct user or use a form.
-              # Recent Streamlit versions support chat_input in containers.
-              if prompt := st.chat_input("Ask about the report or data...", key="chat_input_popover"):
-                  # Add user message
-                  st.session_state.messages.append({"role": "user", "content": prompt})
-                  with st.chat_message("user"):
-                      st.markdown(prompt)
-
-                  # Generate Response
-                  with st.chat_message("assistant"):
-                      message_placeholder = st.empty()
-                      
-                      # Gather Context
-                      report_context = st.session_state.get('generated_report', "")
-                      analysis_df = st.session_state.get('analysis_df', pd.DataFrame())
-                      data_context = chatbot_utils.get_data_context(analysis_df)
-                      
-                      try:
-                          # Stream response
-                          full_response = ""
-                          response_stream = chatbot_utils.chat_stream(
-                              messages=st.session_state.messages,
-                              report_context=report_context,
-                              data_context=data_context
-                          )
-                          
-                          for chunk in response_stream:
-                              if chunk.text:
-                                  full_response += chunk.text
-                                  message_placeholder.markdown(full_response + "▌")
-                          
-                          message_placeholder.markdown(full_response)
-                          
-                          # Append to history
-                          st.session_state.messages.append({"role": "assistant", "content": full_response})
-                          
-                      except Exception as e:
-                          st.error(f"Error generating response: {e}")
 
     # Fetch reviews
     df_analysis = db_utils.get_all_reviews()
@@ -681,6 +582,7 @@ with tab3:
             c_down1, c_down2, c_down3 = st.columns(3)
             
             with c_down1:
+                import report_utils
                 # Convert to PDF on the fly
                 pdf_io = report_utils.create_pdf_from_markdown(st.session_state['generated_report'])
                 st.download_button(
@@ -691,6 +593,7 @@ with tab3:
                 )
             
             with c_down2:
+                import report_utils
                 # Convert to DOCX on the fly
                 docx_io = report_utils.create_docx_from_markdown(st.session_state['generated_report'])
                 st.download_button(
@@ -701,6 +604,7 @@ with tab3:
                 )
 
             with c_down3:
+                import report_utils
                 # Convert to PPTX on the fly
                 pptx_io = report_utils.create_pptx_from_markdown(st.session_state['generated_report'])
                 st.download_button(
@@ -720,6 +624,7 @@ with tab3:
                         df_for_ai['review_date'] = df_for_ai['review_date'].dt.strftime('%Y-%m-%d')
                         reviews_list = df_for_ai[['user_name', 'rating_overall', 'content', 'review_date']].to_dict(orient='records')
                         
+                        import ocr_utils
                         report_stream = ocr_utils.analyze_sentiment_batch(reviews_list, language=language, stream=True)
                         
                         full_report = ""
@@ -765,4 +670,104 @@ with tab3:
             st.rerun()
     else:
         st.info("No reviews found to analyze.")
+
+print("DEBUG: Check AI tab")
+# AI Assistant in separate tab
+with tab_ai:
+    print("DEBUG: Entering AI tab")
+    st.title("🤖 AI Assistant")
+    st.markdown("Ask me anything about the **Data**, **Reports**, or this **Tool**!")
+    
+    import chatbot_utils
+    # Check validity
+    if not chatbot_utils.configure_genai():
+        st.warning("⚠️ Google API Key not found.")
+        st.stop()
+    
+    # Common Questions Buttons
+    st.caption("Common Questions:")
+    cq1, cq2, cq3, cq4 = st.columns(4)
+    with cq1:
+        if st.button("📈 Trends Review"):
+            st.session_state['next_prompt'] = "What are the top trends in the reviews?"
+    with cq2:
+        if st.button("👎 Main Complaints"):
+            st.session_state['next_prompt'] = "What are the customers complaining about the most?"
+    with cq3:
+        if st.button("📝 Draft Reply"):
+            st.session_state['next_prompt'] = "Draft a polite response to a negative review about service."
+    with cq4:
+        if st.button("💡 Improvements"):
+            st.session_state['next_prompt'] = "Give me 3 actionable improvements based on feedback."
+
+    # Use full width container for chat
+    chat_container = st.container()
+
+    # Initialize Chat History
+    if "messages" not in st.session_state:
+        st.session_state.messages = [
+            {"role": "assistant", "content": "Hello! I am your AI Assistant. I can help you understand the reviews, analyze data trends, or explain how to use this tool. What's on your mind?"}
+        ]
+
+    # Display Chat History
+    with chat_container:
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+    
+    # Handle User Input
+    # Check if we have a preset prompt from buttons
+    user_input = st.chat_input("Ask a question...")
+    
+    # Priority to button click
+    if 'next_prompt' in st.session_state and st.session_state['next_prompt']:
+        prompt = st.session_state['next_prompt']
+        del st.session_state['next_prompt'] # Clear it
+    else:
+        prompt = user_input
+
+    if prompt:
+        # Add user message
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with chat_container:
+            with st.chat_message("user"):
+                st.markdown(prompt)
+
+            # Generate Response
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                
+                # Gather Context
+                report_context = st.session_state.get('generated_report', "")
+                
+                # Retrieve Analysis DF (Filtered) or Fallback to Full DF
+                if 'analysis_df' in st.session_state:
+                    analysis_df = st.session_state['analysis_df']
+                else:
+                    # Fallback so it works even if user hasn't visited Analysis tab
+                    analysis_df = db_utils.get_all_reviews()
+                
+                data_context = chatbot_utils.get_data_context(analysis_df)
+                
+                try:
+                    # Stream response
+                    full_response = ""
+                    response_stream = chatbot_utils.chat_stream(
+                        messages=st.session_state.messages,
+                        report_context=report_context,
+                        data_context=data_context
+                    )
+                    
+                    for chunk in response_stream:
+                        if chunk.text:
+                            full_response += chunk.text
+                            message_placeholder.markdown(full_response + "▌")
+                    
+                    message_placeholder.markdown(full_response)
+                    
+                    # Append to history
+                    st.session_state.messages.append({"role": "assistant", "content": full_response})
+                    
+                except Exception as e:
+                    st.error(f"Error generating response: {e}")
 

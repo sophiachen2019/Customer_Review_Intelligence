@@ -17,3 +17,4 @@ env/
 
 # Uploads
 uploads/
+streamlit.log
